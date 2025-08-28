@@ -3,6 +3,7 @@ package com.chong.lectorDeHuella.controller;
 import com.chong.lectorDeHuella.dto.OperadorDesdeHuellaDTO;
 import com.chong.lectorDeHuella.model.Operador;
 import com.chong.lectorDeHuella.service.OperadorService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @RequestMapping("/api/operadores")
 public class OperadorController {
 
+    @Autowired
     private final OperadorService operadorService;
 
     public OperadorController(OperadorService operadorService) {
@@ -51,5 +53,18 @@ public class OperadorController {
         op.setApellidoMaterno(dto.apellidoMaterno);
         op.setNumeroOperador(dto.numeroOperador);
         return ResponseEntity.ok(operadorService.save(op));
+    }
+
+    // ✅ Actualizar operador
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateOperador(@PathVariable int id, @RequestBody Operador operador) {
+        operador.setIdOperador(id);
+        return operadorService.guardarCambioOperador(operador);
+    }
+
+    // ✅ Eliminar operador
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteOperador(@PathVariable int id) {
+        return operadorService.eliminarOperador(id);
     }
 }

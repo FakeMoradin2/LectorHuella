@@ -5,6 +5,7 @@ import com.chong.lectorDeHuella.model.Operador;
 import com.chong.lectorDeHuella.model.Prestamo;
 import com.chong.lectorDeHuella.service.OperadorService;
 import com.chong.lectorDeHuella.service.PrestamoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @RequestMapping("/api/prestamos")
 public class PrestamoController {
 
+    @Autowired
     private final PrestamoService prestamoService;
     private final OperadorService operadorService;
 
@@ -67,5 +69,18 @@ public class PrestamoController {
     @GetMapping("/por-operador/{idOperador}")
     public List<Prestamo> getByOperador(@PathVariable int idOperador) {
         return prestamoService.findByOperador(idOperador);
+    }
+
+    // ✅ Actualizar préstamo
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatePrestamo(@PathVariable int id, @RequestBody Prestamo prestamo) {
+        prestamo.setIdPrestamo(id);
+        return prestamoService.guardarCambioPrestamo(prestamo);
+    }
+
+    // ✅ Eliminar préstamo
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePrestamo(@PathVariable int id) {
+        return prestamoService.eliminarPrestamo(id);
     }
 }
