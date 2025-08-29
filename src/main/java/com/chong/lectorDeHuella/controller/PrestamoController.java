@@ -73,10 +73,22 @@ public class PrestamoController {
 
     // ✅ Actualizar préstamo
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePrestamo(@PathVariable int id, @RequestBody Prestamo prestamo) {
-        prestamo.setIdPrestamo(id);
-        return prestamoService.guardarCambioPrestamo(prestamo);
+    public ResponseEntity<?> updatePrestamo(@PathVariable Integer id, @RequestBody Prestamo body) {
+        return prestamoService.findById(id)
+                .map(existing -> {
+                    // Copia de campos editables
+                    existing.setConcepto(body.getConcepto());
+                    existing.setMonto(body.getMonto());
+                    existing.setAprobado(body.isAprobado());
+                    existing.setFechaPrestamo(body.getFechaPrestamo());
+                    // OJO: no tocar existing.setOperador(...)
+
+                    Prestamo guardado = prestamoService.save(existing);
+                    return ResponseEntity.ok(guardado);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
+
 
     // ✅ Eliminar préstamo
     @DeleteMapping("/{id}")

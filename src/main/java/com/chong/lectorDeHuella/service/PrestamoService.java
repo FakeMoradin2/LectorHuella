@@ -13,9 +13,9 @@ import java.util.Optional;
 @Service
 public class PrestamoService {
 
-    @Autowired
     private final PrestamoRepository prestamoRepository;
 
+    @Autowired
     public PrestamoService(PrestamoRepository prestamoRepository) {
         this.prestamoRepository = prestamoRepository;
     }
@@ -28,11 +28,23 @@ public class PrestamoService {
         return prestamoRepository.save(prestamo);
     }
 
-    public ResponseEntity<?> guardarCambioPrestamo(Prestamo prestamo) {
-        if (!prestamoRepository.existsById(prestamo.getIdPrestamo())) {
+    // 🔹 Actualizar con merge para no perder operador
+    public ResponseEntity<?> guardarCambioPrestamo(Prestamo body) {
+        Optional<Prestamo> opt = prestamoRepository.findById(body.getIdPrestamo());
+        if (opt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Préstamo no encontrado");
         }
-        Prestamo actualizado = prestamoRepository.save(prestamo);
+
+        Prestamo existing = opt.get();
+
+        // Copiar solo campos editables
+        existing.setConcepto(body.getConcepto());
+        existing.setMonto(body.getMonto());
+        existing.setAprobado(body.isAprobado());
+        existing.setFechaPrestamo(body.getFechaPrestamo());
+        // ⚠️ No tocar existing.setOperador()
+
+        Prestamo actualizado = prestamoRepository.save(existing);
         return ResponseEntity.ok(actualizado);
     }
 
@@ -44,17 +56,14 @@ public class PrestamoService {
         return ResponseEntity.ok("Préstamo eliminado con éxito");
     }
 
-    // ✅ Para GET /api/prestamos/{id}/operador
     public Optional<Prestamo> findById(int id) {
         return prestamoRepository.findById(id);
     }
 
-    // ✅ Para GET /api/prestamos/por-operador/{idOperador}
     public List<Prestamo> findByOperador(int idOperador) {
         return prestamoRepository.findByOperador_IdOperador(idOperador);
     }
 
-    // ✅ Útil en el endpoint crear-desde-huella
     public Prestamo save(Prestamo prestamo) {
         return prestamoRepository.save(prestamo);
     }
