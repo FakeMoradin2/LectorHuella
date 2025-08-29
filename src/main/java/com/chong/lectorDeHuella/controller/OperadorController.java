@@ -2,12 +2,15 @@ package com.chong.lectorDeHuella.controller;
 
 import com.chong.lectorDeHuella.dto.OperadorDesdeHuellaDTO;
 import com.chong.lectorDeHuella.model.Operador;
+import com.chong.lectorDeHuella.repository.OperadorRepository;
 import com.chong.lectorDeHuella.service.OperadorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/operadores")
@@ -16,8 +19,11 @@ public class OperadorController {
     @Autowired
     private final OperadorService operadorService;
 
-    public OperadorController(OperadorService operadorService) {
+    private final OperadorRepository operadorRepository;
+
+    public OperadorController(OperadorService operadorService, OperadorRepository operadorRepository) {
         this.operadorService = operadorService;
+        this.operadorRepository = operadorRepository;
     }
 
     // ========== LO QUE YA TENÍAS ==========
@@ -29,6 +35,13 @@ public class OperadorController {
     @PostMapping
     public Operador create(@RequestBody Operador operador) {
         return operadorService.createOperador(operador);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Operador> getById(@PathVariable Integer id)
+    {
+        Optional<Operador> operador = Optional.ofNullable(operadorService.findById(id));
+        return operador.isPresent() ? ResponseEntity.ok(operador.get()) : ResponseEntity.notFound().build();
     }
 
     // ========== NUEVOS PARA ESP32 ==========

@@ -24,6 +24,11 @@ public class OperadorService {
         return operadorRepository.findAll(); //get que tiene el repositorio
     }
 
+    public Operador findById(int id) {
+        Optional<Operador> op = operadorRepository.findById(id);
+        return op.orElse(null);
+    }
+
     public Operador createOperador(Operador operador) {
         return operadorRepository.save(operador); //post del repositorio
     }
