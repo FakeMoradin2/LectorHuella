@@ -2,12 +2,15 @@ package com.chong.lectorDeHuella.controller;
 
 import com.chong.lectorDeHuella.dto.OperadorDesdeHuellaDTO;
 import com.chong.lectorDeHuella.model.Operador;
+import com.chong.lectorDeHuella.model.Prestamo;
 import com.chong.lectorDeHuella.repository.OperadorRepository;
 import com.chong.lectorDeHuella.service.OperadorService;
+import com.chong.lectorDeHuella.service.PrestamoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +23,8 @@ public class OperadorController {
     private final OperadorService operadorService;
 
     private final OperadorRepository operadorRepository;
+    @Autowired
+    private PrestamoService prestamoService;
 
     public OperadorController(OperadorService operadorService, OperadorRepository operadorRepository) {
         this.operadorService = operadorService;
@@ -43,6 +48,24 @@ public class OperadorController {
         Optional<Operador> operador = Optional.ofNullable(operadorService.findById(id));
         return operador.isPresent() ? ResponseEntity.ok(operador.get()) : ResponseEntity.notFound().build();
     }
+
+    @PostMapping("/{id}")
+    public Prestamo createPrestamo(@PathVariable Integer id, @RequestBody Prestamo prestamo) {
+        // Buscar operador (tu service aquí devuelve Operador o null)
+        Operador operador = operadorService.findById(id);
+        if (operador == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Operador no encontrado con id=" + id);
+        }
+
+        // Forzar creación por si llega un id en el body
+        prestamo.setIdPrestamo(null);
+        prestamo.setOperador(operador);
+
+        // Guardar y devolver el persistido
+        return prestamoService.createPrestamo(prestamo);
+    }
+
+
 
     // ========== NUEVOS PARA ESP32 ==========
     // Buscar por fingerId (para verificar si ya existe)

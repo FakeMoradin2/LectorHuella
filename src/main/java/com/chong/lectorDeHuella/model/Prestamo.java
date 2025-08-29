@@ -11,7 +11,7 @@ public class Prestamo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_prestamo")
-    private int idPrestamo;
+    private Integer idPrestamo;
 
     @Column(name = "concepto", nullable = false, length = 100)
     private String concepto;
@@ -58,7 +58,7 @@ public class Prestamo {
         return concepto;
     }
 
-    public void setIdPrestamo(int idPrestamo) {
+    public void setIdPrestamo(Integer idPrestamo) {
         this.idPrestamo = idPrestamo;
     }
 
